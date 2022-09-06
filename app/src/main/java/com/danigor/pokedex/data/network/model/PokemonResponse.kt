@@ -1,63 +1,60 @@
 package com.danigor.pokedex.data.network.model
 
+import com.google.gson.annotations.SerializedName
 
-import com.squareup.moshi.Json
-import com.squareup.moshi.JsonClass
-
-@JsonClass(generateAdapter = true)
 data class PokemonResponse(
-    @Json(name = "abilities")
+    @SerializedName("abilities")
     val abilities: List<String>,
-    @Json(name = "attack")
+    @SerializedName("attack")
     val attack: Int,
-    @Json(name = "base_exp")
+    @SerializedName("base_exp")
     val baseExp: String,
-    @Json(name = "category")
+    @SerializedName("category")
     val category: String,
-    @Json(name = "cycles")
+    @SerializedName("cycles")
     val cycles: String,
-    @Json(name = "defense")
+    @SerializedName("defense")
     val defense: Int,
-    @Json(name = "egg_groups")
+    @SerializedName("egg_groups")
     val eggGroups: String,
-    @Json(name = "evolutions")
+    @SerializedName("evolutions")
     val evolutions: List<String>,
-    @Json(name = "evolvedfrom")
+    @SerializedName("evolvedfrom")
     val evolvedfrom: String,
-    @Json(name = "female_percentage")
+    @SerializedName("female_percentage")
     val femalePercentage: String,
-    @Json(name = "genderless")
+    @SerializedName("genderless")
     val genderless: Int,
-    @Json(name = "height")
+    @SerializedName("height")
     val height: String,
-    @Json(name = "hp")
+    @SerializedName("hp")
     val hp: Int,
-    @Json(name = "id")
+    @SerializedName("id")
     val id: String,
-    @Json(name = "imageurl")
+    @SerializedName("imageurl")
     val imageurl: String,
-    @Json(name = "male_percentage")
+    @SerializedName("male_percentage")
     val malePercentage: String,
-    @Json(name = "name")
+    @SerializedName("name")
     val name: String,
-    @Json(name = "reason")
+    @SerializedName("reason")
     val reason: String,
-    @Json(name = "special_attack")
+    @SerializedName("special_attack")
     val specialAttack: Int,
-    @Json(name = "special_defense")
+    @SerializedName("special_defense")
     val specialDefense: Int,
-    @Json(name = "speed")
+    @SerializedName("speed")
     val speed: Int,
-    @Json(name = "total")
+    @SerializedName("total")
     val total: Int,
-    @Json(name = "typeofpokemon")
+    @SerializedName("typeofpokemon")
     val typeofpokemon: List<String>,
-    @Json(name = "weaknesses")
+    @SerializedName("weaknesses")
     val weaknesses: List<String>,
-    @Json(name = "weight")
+    @SerializedName("weight")
     val weight: String,
-    @Json(name = "xdescription")
+    @SerializedName("xdescription")
     val xdescription: String,
-    @Json(name = "ydescription")
+    @SerializedName("ydescription")
     val ydescription: String
 )
