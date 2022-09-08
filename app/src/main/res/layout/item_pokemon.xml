@@ -30,50 +30,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:alpha="0.25"
         android:gravity="top"
         android:textSize="18sp"
         android:textStyle="bold"
         tools:text="#001" />
-
-    <TextView
-        android:id="@+id/tvPokemonFirstType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@+id/tvPokemonName"
-        app:layout_constraintBottom_toTopOf="@+id/tvPokemonSecondType"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/background_item_pokemon_span"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/tvPokemonSecondType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/tvPokemonThirdType"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/background_item_pokemon_span"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/tvPokemonThirdType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:background="@drawable/background_item_pokemon_span"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
 
     <ImageView
         android:layout_width="96dp"
@@ -100,5 +60,12 @@
         android:adjustViewBounds="true"
         tools:src="@drawable/pokeball" />
 
+    <ImageView
+        android:id="@+id/ivFav"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:src="@drawable/favorite"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

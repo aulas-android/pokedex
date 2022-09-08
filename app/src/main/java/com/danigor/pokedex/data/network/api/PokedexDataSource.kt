@@ -1,6 +1,8 @@
 package com.danigor.pokedex.data.network.api
 
 import android.content.Context
+import android.util.Log
+import com.danigor.pokedex.data.network.model.Pokemon
 import com.danigor.pokedex.data.network.model.PokemonResponse
 import com.danigor.pokedex.data.readJSONFromAsset
 import com.google.gson.Gson
@@ -15,15 +17,31 @@ class PokedexDataSource(private val context: Context) {
 
     fun getPokedexFromCache(): List<PokemonResponse> {
 
-        val pokedexJson = readJSONFromAsset(context, "Pokedex.json")
-
-        if (pokedexJson == null) {
-            return emptyList()
-        }
+        val pokedexJson = readJSONFromAsset(context, "Pokedex.json") ?: return emptyList()
 
         val type = object : TypeToken<List<PokemonResponse>>() {}.type
-        val pokedex: List<PokemonResponse> = Gson().fromJson(pokedexJson, type)
-        return pokedex
+        return Gson().fromJson(pokedexJson, type)
+    }
+
+    fun getEvolutionsPokedex(): MutableSet<Pokemon> {
+        val pokemonList: MutableSet<Pokemon> = mutableSetOf()
+
+        val currentPokedex = getPokedexFromCache()
+
+        currentPokedex.forEach { pokemonResponse ->
+            val evolutions = pokemonResponse.evolutions.toMutableList().apply {
+                remove(pokemonResponse.id)
+            }
+
+            if (evolutions.size > 0) {
+                val pokemonEvolutions = currentPokedex.filter { pokemonResponse.evolutions.contains(it.id) }
+                pokemonList.add(Pokemon.PokemonWithEvolution(pokemonEvolutions))
+            } else {
+                pokemonList.add(Pokemon.PokemonWithoutEvolution(pokemonResponse))
+            }
+        }
+
+        return pokemonList
     }
 
     suspend fun getPokedex(): List<PokemonResponse> {

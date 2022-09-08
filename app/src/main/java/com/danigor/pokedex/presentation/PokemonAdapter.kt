@@ -1,114 +1,60 @@
 package com.danigor.pokedex.presentation
 
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.annotation.ColorInt
-import androidx.annotation.ColorRes
-import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.danigor.pokedex.R
-import com.danigor.pokedex.data.network.model.PokemonResponse
-import java.util.*
+import com.danigor.pokedex.data.network.model.Pokemon
+
+private const val VIEW_TYPE_EVOLUTION = 1
+private const val VIEW_TYPE_NOT_EVOLUTION = 2
 
 class PokemonAdapter(
-    private val pokemon: List<PokemonResponse>
-) : RecyclerView.Adapter<PokemonAdapter.ViewHolder>() {
+    private val pokemonList: List<Pokemon>,
+    private val selectedListener: OnPokemonSelectedListener
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_pokemon, parent, false)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_EVOLUTION) {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_evolution_pokemon, parent, false)
 
-        return ViewHolder(view)
+            EvolutionViewHolder(view, selectedListener)
+        } else {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_pokemon, parent, false)
+
+            NonEvolutionViewHolder(view, selectedListener)
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindView(pokemon[position])
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when (holder) {
+            is NonEvolutionViewHolder -> {
+                val pokemon = (pokemonList[position] as Pokemon.PokemonWithoutEvolution)
+                holder.bindView(pokemon)
+            }
+            is EvolutionViewHolder -> {
+                val pokemon = (pokemonList[position] as Pokemon.PokemonWithEvolution)
+                holder.bindView(pokemon)
+            }
+        }
     }
 
-    override fun getItemCount(): Int = pokemon.size
+    override fun getItemCount(): Int = pokemonList.size
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        private val tvPokemonName: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonName)
+    override fun getItemViewType(position: Int): Int {
+        return when (pokemonList[position]) {
+            is Pokemon.PokemonWithEvolution -> VIEW_TYPE_EVOLUTION
+            is Pokemon.PokemonWithoutEvolution -> VIEW_TYPE_NOT_EVOLUTION
         }
+    }
 
-        private val tvPokemonNumber: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonNumber)
-        }
-
-        private val tvPokemonFirstType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonFirstType)
-        }
-
-        private val tvPokemonSecondType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonSecondType)
-        }
-
-        private val tvPokemonThirdType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonThirdType)
-        }
-
-        private val ivPokemonPicture: ImageView by lazy {
-            itemView.findViewById(R.id.ivPokemon)
-        }
-
-        fun bindView(item: PokemonResponse) {
-
-
-            tvPokemonName.text = item.name
-            tvPokemonNumber.text = item.id
-
-            val firstType = item.typeofpokemon.getOrNull(0)
-            tvPokemonFirstType.apply {
-                text = firstType
-                isVisible = firstType != null
-            }
-
-            val color = getPokemonColor(firstType)
-            itemView.background.colorFilter =
-                PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
-
-            val secondType = item.typeofpokemon.getOrNull(1)
-            tvPokemonSecondType.apply {
-                text = secondType
-                isVisible = secondType != null
-            }
-
-            val thirdType = item.typeofpokemon.getOrNull(2)
-            tvPokemonThirdType.apply {
-                text = thirdType
-                isVisible = thirdType != null
-            }
-
-            Glide.with(itemView.context).load(item.imageurl).into(ivPokemonPicture)
-        }
-
-        @ColorInt
-        fun getPokemonColor(firstType: String?): Int {
-            val color = when (firstType?.lowercase(Locale.ROOT)) {
-                "grass", "bug" -> R.color.lightTeal
-                "fire" -> R.color.lightRed
-                "water", "fighting", "normal" -> R.color.lightBlue
-                "electric", "psychic" -> R.color.lightYellow
-                "poison", "ghost" -> R.color.lightPurple
-                "ground", "rock" -> R.color.lightBrown
-                "dark" -> R.color.black
-                else -> R.color.lightBlue
-            }
-            return convertColor(color)
-        }
-
-        @ColorInt
-        fun convertColor(@ColorRes color: Int): Int {
-            return ContextCompat.getColor(itemView.context, color)
+    fun favoritePokemon(pokemon: Pokemon) {
+        val pokemonIndex = pokemonList.indexOfFirst { pokemon == it }
+        if (pokemonIndex != -1) {
+            pokemonList[pokemonIndex].isFavorite = !pokemonList[pokemonIndex].isFavorite
+            notifyItemChanged(pokemonIndex)
         }
     }
 }
