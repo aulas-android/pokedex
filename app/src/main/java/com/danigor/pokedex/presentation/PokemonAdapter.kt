@@ -14,101 +14,126 @@ import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.danigor.pokedex.R
-import com.danigor.pokedex.data.network.model.PokemonResponse
+import com.danigor.pokedex.data.network.model.PokemonInfo
 import java.util.*
 
+const val VIEW_TYPE_HEADER = 2
+const val VIEW_TYPE_POKEMON = 1
+
 class PokemonAdapter(
-    private val pokemon: List<PokemonResponse>
-) : RecyclerView.Adapter<PokemonAdapter.ViewHolder>() {
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_pokemon, parent, false)
-
-        return ViewHolder(view)
+    private val pokemonList: MutableList<PokemonInfo>
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return if (viewType == VIEW_TYPE_HEADER) {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_header, parent, false)
+            HeaderViewHolder(view)
+        } else {
+            val view = LayoutInflater.from(parent.context)
+                .inflate(R.layout.item_pokemon, parent, false)
+            PokemonViewHolder(view)
+        }
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bindView(pokemon[position])
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when(holder) {
+            is PokemonViewHolder -> holder.bindView(pokemonList[position] as PokemonInfo.Pokemon)
+            is HeaderViewHolder -> holder.bindView(pokemonList[position] as PokemonInfo.Header)
+        }
     }
 
-    override fun getItemCount(): Int = pokemon.size
+    override fun getItemCount(): Int = pokemonList.size
 
-    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    override fun getItemViewType(position: Int): Int {
+        return when (pokemonList[position]) {
+            is PokemonInfo.Pokemon -> VIEW_TYPE_POKEMON
+            is PokemonInfo.Header -> VIEW_TYPE_HEADER
+        }
+    }
+}
 
-        private val tvPokemonName: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonName)
+class PokemonViewHolder(
+    itemView: View
+) : RecyclerView.ViewHolder(itemView) {
+
+    private val tvPokemonName: TextView by lazy {
+        itemView.findViewById(R.id.tvPokemonName)
+    }
+
+    private val tvPokemonNumber: TextView by lazy {
+        itemView.findViewById(R.id.tvPokemonNumber)
+    }
+
+    private val ivPokemon: ImageView by lazy {
+        itemView.findViewById(R.id.ivPokemon)
+    }
+
+    private val tvPokemonFirstType: TextView by lazy {
+        itemView.findViewById(R.id.tvPokemonFirstType)
+    }
+
+    private val tvPokemonSecondType: TextView by lazy {
+        itemView.findViewById(R.id.tvPokemonSecondType)
+    }
+
+    fun bindView(item: PokemonInfo.Pokemon) {
+
+        val pokemonResponse = item.pokemonResponse
+
+        tvPokemonName.text = pokemonResponse.name
+        tvPokemonNumber.text = pokemonResponse.id
+
+        Glide.with(itemView.context).load(pokemonResponse.imageurl).into(ivPokemon)
+
+        val color = getPokemonColor(pokemonResponse.typeofpokemon)
+        itemView.background.colorFilter =
+            PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
+
+        val firstType = pokemonResponse.typeofpokemon.getOrNull(0)
+        tvPokemonFirstType.apply {
+            text = firstType
+            isVisible = firstType != null
         }
 
-        private val tvPokemonNumber: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonNumber)
+        val secondType = pokemonResponse.typeofpokemon.getOrNull(1)
+        tvPokemonSecondType.apply {
+            text = secondType
+            isVisible = secondType != null
         }
+    }
 
-        private val tvPokemonFirstType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonFirstType)
+    @ColorInt
+    fun getPokemonColor(type: List<String?>): Int {
+        val firstType = type[0]
+        val color = when (firstType?.lowercase(Locale.ROOT)) {
+            "grass", "bug" -> R.color.lightTeal
+            "fire" -> R.color.lightRed
+            "water", "fighting", "normal" -> R.color.lightBlue
+            "electric", "psychic" -> R.color.lightYellow
+            "poison", "ghost" -> R.color.lightPurple
+            "ground", "rock" -> R.color.lightBrown
+            "dark" -> R.color.black
+            else -> R.color.lightBlue
         }
+        return convertColor(color)
+    }
 
-        private val tvPokemonSecondType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonSecondType)
-        }
+    @ColorInt
+    fun convertColor(@ColorRes color: Int): Int {
+        return ContextCompat.getColor(itemView.context, color)
+    }
 
-        private val tvPokemonThirdType: TextView by lazy {
-            itemView.findViewById(R.id.tvPokemonThirdType)
-        }
+}
 
-        private val ivPokemonPicture: ImageView by lazy {
-            itemView.findViewById(R.id.ivPokemon)
-        }
+class HeaderViewHolder(
+    itemView: View
+) : RecyclerView.ViewHolder(itemView) {
 
-        fun bindView(item: PokemonResponse) {
+    private val tvHeader: TextView by lazy {
+        itemView.findViewById(R.id.tvHeader)
+    }
 
-
-            tvPokemonName.text = item.name
-            tvPokemonNumber.text = item.id
-
-            val firstType = item.typeofpokemon.getOrNull(0)
-            tvPokemonFirstType.apply {
-                text = firstType
-                isVisible = firstType != null
-            }
-
-            val color = getPokemonColor(firstType)
-            itemView.background.colorFilter =
-                PorterDuffColorFilter(color, PorterDuff.Mode.SRC_ATOP)
-
-            val secondType = item.typeofpokemon.getOrNull(1)
-            tvPokemonSecondType.apply {
-                text = secondType
-                isVisible = secondType != null
-            }
-
-            val thirdType = item.typeofpokemon.getOrNull(2)
-            tvPokemonThirdType.apply {
-                text = thirdType
-                isVisible = thirdType != null
-            }
-
-            Glide.with(itemView.context).load(item.imageurl).into(ivPokemonPicture)
-        }
-
-        @ColorInt
-        fun getPokemonColor(firstType: String?): Int {
-            val color = when (firstType?.lowercase(Locale.ROOT)) {
-                "grass", "bug" -> R.color.lightTeal
-                "fire" -> R.color.lightRed
-                "water", "fighting", "normal" -> R.color.lightBlue
-                "electric", "psychic" -> R.color.lightYellow
-                "poison", "ghost" -> R.color.lightPurple
-                "ground", "rock" -> R.color.lightBrown
-                "dark" -> R.color.black
-                else -> R.color.lightBlue
-            }
-            return convertColor(color)
-        }
-
-        @ColorInt
-        fun convertColor(@ColorRes color: Int): Int {
-            return ContextCompat.getColor(itemView.context, color)
-        }
+    fun bindView(item: PokemonInfo.Header) {
+        tvHeader.text = item.title
     }
 }

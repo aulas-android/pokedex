@@ -1,34 +1,37 @@
 package com.danigor.pokedex.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.lifecycle.lifecycleScope
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.danigor.pokedex.R
 import com.danigor.pokedex.data.network.api.PokedexDataSource
-import kotlinx.coroutines.launch
+import com.danigor.pokedex.data.network.model.PokemonInfo
 
 class MainActivity : AppCompatActivity() {
-
-    private val pokedexDataSource = PokedexDataSource(this)
+    private lateinit var pokemonAdapter: PokemonAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         val rvPokedex = findViewById<RecyclerView>(R.id.rvPokedex)
 
+        val pokemonList = PokedexDataSource(this).getPokedexFromCache()
 
-        lifecycleScope.launch {
-            val pokedex = pokedexDataSource.getPokedex()
-            val secondPokedex = pokedexDataSource.getPokedexFromCache()
+        val pokemonItems: MutableList<PokemonInfo> = mutableListOf()
 
-            with(rvPokedex) {
-                layoutManager = LinearLayoutManager(this@MainActivity)
-                adapter = PokemonAdapter(pokedex)
-            }
+        pokemonItems.add(PokemonInfo.Header("My Pokémon"))
+
+        pokemonList.forEach {
+            pokemonItems.add(PokemonInfo.Pokemon(it))
+        }
+
+        pokemonAdapter = PokemonAdapter(pokemonItems.toMutableList())
+
+        with(rvPokedex) {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = pokemonAdapter
         }
     }
+
 }

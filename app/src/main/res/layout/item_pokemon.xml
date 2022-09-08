@@ -54,21 +54,9 @@
         android:id="@+id/tvPokemonSecondType"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/tvPokemonThirdType"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginBottom="8dp"
-        android:background="@drawable/background_item_pokemon_span"
-        android:paddingStart="8dp"
-        android:paddingEnd="8dp"
-        android:textColor="@color/white"
-        android:textSize="14sp" />
-
-    <TextView
-        android:id="@+id/tvPokemonThirdType"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="8dp"
         android:background="@drawable/background_item_pokemon_span"
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
